@@ -22,4 +22,7 @@ and open the template in the editor.
         // Test 123 
         ?>
     </body>
+     <?php
+        include './ProjectCommon/Footer.php';
+    ?>
 </html>
