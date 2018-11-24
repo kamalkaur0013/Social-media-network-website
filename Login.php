@@ -61,7 +61,7 @@ include("./ProjectCommon/Class_Lib.php");
         
         if($valid)
         {
-            $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
+            $dbConnection = parse_ini_file("./ProjectCommon/db_connection.ini");
             extract($dbConnection);
             try {
                 $myPdo = new PDO($dsn, $user, $pw);
