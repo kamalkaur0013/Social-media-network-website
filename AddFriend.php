@@ -25,7 +25,7 @@ and open the template in the editor.
         
         <form method = "POST" >
             <tr>
-                 <td>ID: </td><td><input type = "text" name = "ID"></td>
+                 <td>ID: </td><td><input type = "text" name = "ID" ></td>
             </tr>
             
             <input name="SendFriendRequest" type = "submit" value = "Send Friend Request"  class="btn btn-info" />
