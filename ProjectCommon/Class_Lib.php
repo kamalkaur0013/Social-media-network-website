@@ -88,6 +88,4 @@ function ValidatePassword2($password1, $password2)
 }
 
 
-
-
 ?>
