@@ -65,7 +65,7 @@ include("./ProjectCommon/Class_Lib.php");
             $hashedPassword = sha1($password1);	
                         
             $user1 = new User($userId, $userName, $phone, $hashedPassword);
-            $dbConnection = parse_ini_file("./db_connection.ini");
+            $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
             extract($dbConnection);
             
             try {
