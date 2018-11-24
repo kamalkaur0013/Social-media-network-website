@@ -24,6 +24,8 @@ and open the template in the editor.
         <p>Enter the Id of the user you want to be Friends with</p>
         
         <form method = "POST" >
+             <td><span class="error" style="color: red"> <?php echo $requestSent; ?></span></td>
+             <br>
             <tr>
                  <td>ID: </td><td><input type = "text" name = "ID" ></td>
             </tr>
