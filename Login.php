@@ -161,8 +161,9 @@ include("./ProjectCommon/Class_Lib.php");
         <div class='form-group'>
             <div class='col-sm-2'></div>
             <div class='col-sm-2'>
-            <button type='submit' class='btn btn-default btn-primary' name='submit'>Submit</button>&nbsp
-            <button type='reset' class='btn btn-default btn-primary' name='clear'>Clear</button></div>
+            <button type='submit' class='col-sm-12 btn btn-default btn-primary' name='submit'>Submit</button></div>
+            <div class='col-sm-2'>
+            <button type='reset' class='col-sm-12 btn btn-default btn-primary' name='clear'>Clear</button></div>
         </div>
     </form>
     ";
