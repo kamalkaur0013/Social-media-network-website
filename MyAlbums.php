@@ -34,19 +34,17 @@ include("./ProjectCommon/Class_Lib.php");
             
             // drop down selection
             $accessSelection = $_POST["accessChoice"];
-                        
+            $accessSelection_explode = explode("|", $accessSelection);
+            $accessChoice = $accessSelection_explode[0]; // accessibility option
+            $albumid = $accessSelection_explode[1];  // album id
+                 
             // save changes for accessibility
             if (isset($_POST["saveBtn"]))
             {               
-                for ($i = 0; $i < count($accessSelection); $i++)
-                {
-                    $newAccess = $accessSelection[$i];
-                    $albumId = $i+1;
-                    $sqlUpdateAccess = "UPDATE Album SET Accessibility_Code = :updatedAccess "
-                            . "WHERE Album_Id = :id";
-                    $stmtSaveChanges = $myPdo->prepare($sqlUpdateAccess);
-                    $stmtSaveChanges->execute(['updatedAccess'=> $newAccess, 'id'=>$albumId]);             
-                }           
+                $sqlUpdateAccess = "UPDATE Album SET Accessibility_Code = :updatedAccess "
+                        . "WHERE Album_Id = :id";
+                $stmtSaveChanges = $myPdo->prepare($sqlUpdateAccess);
+                $stmtSaveChanges->execute(['updatedAccess'=> $accessChoice, 'id'=>$albumid]);             
             }
         
         
@@ -75,7 +73,7 @@ include("./ProjectCommon/Class_Lib.php");
 
             <?php 
 
-
+            //comment
             // get albums
             $sqlGetAlbums = "SELECT Album.Album_Id, Album.Title, Album.Date_Updated, COUNT(Picture.Picture_Id) as 'Total', Album.Accessibility_Code "
                     . "FROM Album "
@@ -103,11 +101,11 @@ include("./ProjectCommon/Class_Lib.php");
                 <td><?=$album["Date_Updated"]?></td>
                 <td><?=$album["Total"]?></td>
                 <td>
-                    <select class="form-control" name="accessChoice[]">  
+                    <select class="form-control" name="accessChoice">  
                      <!--set drop down values to accessibility codes-->
                      <!--set drop down selection to the albums accessibility code-->
                     <?php foreach ($accessArray as $accessOption): ?>
-                        <option value="<?=$accessOption['Accessibility_Code']?>"
+                        <option value="<?=$accessOption['Accessibility_Code']?>|<?=$album['Album_Id']?>"
                             <?php if($album['Accessibility_Code'] == $accessOption['Accessibility_Code']) 
                                 echo 'selected="selected"';?>>
                             <!--show accessibility description as drop down option-->
