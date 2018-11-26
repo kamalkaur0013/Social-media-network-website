@@ -73,7 +73,6 @@ include("./ProjectCommon/Header.php");
 
             <?php 
 
-            
 
             // get albums
             $sqlGetAlbums = "SELECT Album.Album_Id, Album.Title, Album.Date_Updated, COUNT(Picture.Picture_Id) as 'Total', Album.Accessibility_Code "
