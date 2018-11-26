@@ -5,6 +5,11 @@ include("./ProjectCommon/Class_Lib.php");
 <html>
 <head>
     <title>Algonquin Social Media</title>  
+
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
     <?php 
@@ -24,8 +29,7 @@ include("./ProjectCommon/Class_Lib.php");
     
     try {
         $myPdo = new PDO($dsn, $user, $pw);
-
-        $sql = "SELECT * From Accessibility";
+         $sql = "SELECT * From Accessibility";
         //make the dropdown list for the accessibility
         foreach($myPdo->query($sql) as $row)
         {
@@ -47,8 +51,7 @@ include("./ProjectCommon/Class_Lib.php");
             //$date = date('Y/m/d H:i:s');
             try {
                 $sql = "INSERT INTO Album VALUES(:Album_Id, :Title, :Description, :Date_Updated, :Owner_Id, :Accessibility_Code)";
-
-                $pStmt = $myPdo->prepare($sql);    
+                 $pStmt = $myPdo->prepare($sql);    
                 $pStmt->execute([  'Album_Id' => null,
                                    'Title' => $title, 
                                    'Description' => $desc,
@@ -67,8 +70,7 @@ include("./ProjectCommon/Class_Lib.php");
             $errTitle = "Enter title";
         }
     }
-
-    ?>
+     ?>
     <div class="container">
         </br>
         <?php echo "<p> ".$date."</p>";?>
@@ -81,8 +83,7 @@ include("./ProjectCommon/Class_Lib.php");
     <p>Welcome <b><?php echo $user1['Name']; ?></b>! (not you? change user <a href='./Login.php?action=out'>here</a>)</p>
     <p class='error'><?php echo $errLogin; ?></p>
     </br>
-
-    
+     
     <div class="form-group">
         <div class='col-sm-2'><label for="title">Title:</label></div>
         <div class='col-sm-4'><input type="text" class="form-control" id="title" name="title" value=""></div>
@@ -120,5 +121,4 @@ include("./ProjectCommon/Class_Lib.php");
    </div>
 <?php include("./ProjectCommon/Footer.php"); ?>
 </body>
-
-</html>
+ </html> 
