@@ -15,6 +15,7 @@ include("./ProjectCommon/Header.php");
             extract($_POST);
             $user1 = $_SESSION["user"];
             
+            // db connection
             $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
             extract($dbConnection);
             global $myPdo;
