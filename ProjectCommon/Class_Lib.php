@@ -1,4 +1,6 @@
 <?php
+include_once "ConstantsAndSettings.php";
+
 class User 
 {
     private $id;
@@ -88,6 +90,126 @@ function ValidatePassword2($password1, $password2)
 }
 
 
+class Picture {
+    private $fileName;
+    private $id;
+    
+    public static function getPictures() 
+    {
+        $pictures = array();
+        $files = scandir(ALBUM_THUMBNAILS_DIR);
+        $numFiles = count($files);
+        
+        if ($numFiles > 2)
+        {
+            for ($i = 2; $i < $numFiles; $i++)
+            {
+                $ind = strrpos($files[$i], "/");
+                $fileName = substr($files[$i], $ind);
+                $picture = new Picture($fileName, $i);
+                $pictures["$i"] = $picture;
+            }
+        }
+        return $pictures;
+    }
+    
+    public function __construct($fileName,$id) {
+         $this->fileName = $fileName;
+         $this->id = $id;
+     }
+     
+     public function getId() {
+         return $this->id;
+     }
+     
+       public function getName() {
+         $ind = strrpos($this->fileName, ".");
+         $name = substr($this->fileName, 0, $ind);
+         return $name;
+     }
+    
+    public function getAlbumFilePath() {
+        return ALBUM_PICTURES_DIR."/".$this->fileName;
+    }
+    
+    public function getThumbnailFilePath() {
+        return ALBUM_THUMBNAILS_DIR."/".$this->fileName;
+    }
+    
+    public function getOriginalFilePath() {
+        return ORIGINAL_PICTURES_DIR."/".$this->fileName;
+    }
+    
+}
 
+function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight)
+{
+    if (!file_exists($destinationPath))
+    {
+            mkdir($destinationPath);
+    }
+
+    $imageDetails = getimagesize($filePath);
+
+    $originalResource = null;
+    if ($imageDetails[2] == IMAGETYPE_JPEG) 
+    {
+            $originalResource = imagecreatefromjpeg($filePath);
+    } 
+    elseif ($imageDetails[2] == IMAGETYPE_PNG) 
+    {
+            $originalResource = imagecreatefrompng($filePath);
+    } 
+    elseif ($imageDetails[2] == IMAGETYPE_GIF) 
+    {
+            $originalResource = imagecreatefromgif($filePath);
+    }
+    $widthRatio = $imageDetails[0] / $maxWidth;
+    $heightRatio = $imageDetails[1] / $maxHeight;
+    $ratio = max($widthRatio, $heightRatio);
+
+    $newWidth = $imageDetails[0] / $ratio;
+    $newHeight = $imageDetails[1] / $ratio;
+
+    $newImage = imagecreatetruecolor($newWidth, $newHeight);
+
+    $success = imagecopyresampled($newImage, $originalResource, 0, 0, 0, 0, $newWidth, $newHeight, $imageDetails[0], $imageDetails[1]);
+
+    if (!$success)
+    {
+            imagedestroy(newImage);
+            imagedestroy(originalResource);
+            return "";
+    }
+    $pathInfo = pathinfo($filePath);
+    $newFilePath = $destinationPath."/".$pathInfo['filename'];
+    if ($imageDetails[2] == IMAGETYPE_JPEG) 
+    {
+            $newFilePath .= ".jpg";
+            $success = imagejpeg($newImage, $newFilePath, 100);
+    } 
+    elseif ($imageDetails[2] == IMAGETYPE_PNG) 
+    {
+            $newFilePath .= ".png";
+            $success = imagepng($newImage, $newFilePath, 0);
+    } 
+    elseif ($imageDetails[2] == IMAGETYPE_GIF) 
+    {
+            $newFilePath .= ".gif";
+            $success = imagegif($newImage, $newFilePath);
+    }
+
+    imagedestroy($newImage);
+    imagedestroy($originalResource);
+
+    if (!$success)
+    {
+            return "";
+    }
+    else
+    {
+            return $newFilePath;
+    }
+}
 
 ?>
