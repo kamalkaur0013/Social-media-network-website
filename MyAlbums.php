@@ -33,7 +33,7 @@ include("./ProjectCommon/Header.php");
             // drop down selection
             $accessSelection = $_POST["accessChoice"];
                         
-            // save changes
+            // save changes for accessibility
             if (isset($_POST["saveBtn"]))
             {               
                 for ($i = 0; $i < count($accessSelection); $i++)
