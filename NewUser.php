@@ -5,7 +5,8 @@ include("./ProjectCommon/Class_Lib.php");
 <html>
 <head>
     <title>Algonquin Social Media</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
@@ -65,7 +66,7 @@ include("./ProjectCommon/Class_Lib.php");
             $hashedPassword = sha1($password1);	
                         
             $user1 = new User($userId, $userName, $phone, $hashedPassword);
-            $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
+            $dbConnection = parse_ini_file("./ProjectCommon/db_connection.ini");
             extract($dbConnection);
             
             try {

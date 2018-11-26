@@ -5,9 +5,6 @@ include("./ProjectCommon/Class_Lib.php");
 <html>
 <head>
     <title>Algonquin Social Media</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
 </head>
 <body>
@@ -61,7 +58,7 @@ include("./ProjectCommon/Class_Lib.php");
         
         if($valid)
         {
-            $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
+            $dbConnection = parse_ini_file("./ProjectCommon/db_connection.ini");
             extract($dbConnection);
             try {
                 $myPdo = new PDO($dsn, $user, $pw);
@@ -164,8 +161,9 @@ include("./ProjectCommon/Class_Lib.php");
         <div class='form-group'>
             <div class='col-sm-2'></div>
             <div class='col-sm-2'>
-            <button type='submit' class='btn btn-default btn-primary' name='submit'>Submit</button>&nbsp
-            <button type='reset' class='btn btn-default btn-primary' name='clear'>Clear</button></div>
+            <button type='submit' class='col-sm-12 btn btn-default btn-primary' name='submit'>Submit</button></div>
+            <div class='col-sm-2'>
+            <button type='reset' class='col-sm-12 btn btn-default btn-primary' name='clear'>Clear</button></div>
         </div>
     </form>
     ";

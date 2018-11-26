@@ -4,6 +4,9 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
+<?php 
+session_start();
+?>
 <html lang="en" style="position: relative; min-height: 100%;">
     <head>
         <meta charset="UTF-8">
@@ -32,12 +35,29 @@ and open the template in the editor.
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
+
+<?php                    
+                $login = false;
+                if(isset($_SESSION['user']))
+                {
+                   if($_SESSION['user'] != "")
+                   {
+                       if($_REQUEST['action']!="out")
+                       {
+                           $login = true;
+                       }
+                   }
+                }
+        ?>
                    <li class="active"><a href="Index.php">Home </a></li>
                    <li><a href="MyFriends.php ">My Friends</a></li>
                    <li><a href="MyAlbums.php ">My Albums</a></li>
                    <li><a href="MyPictures.php">My Pictures</a></li>
                    <li><a href="UploadPictures.php">Upload Pictures</a></li>   
-                   <li><a href="Login.php">Log In</a></li>   
+<?php
+                   $li = $login ? '<li><a href="Logout.php">Log Out</a></li>':'<li><a href="Login.php">Log In</a></li>';
+                   echo $li;                      
+?>
                 </ul>
             </div>
           </div>  

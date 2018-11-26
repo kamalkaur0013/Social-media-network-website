@@ -1,24 +1,39 @@
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
+<?php
+include("./ProjectCommon/Header.php");
+session_start();
+?>
 <html>
-    <?php
-        include './ProjectCommon/Header.php';
-    ?>
     <head>
+        <meta charset="UTF-8">
+        <title>Algonquin Social Media</title>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <title></title>
     </head>
     <body>
+        <?php
+        session_start();
+        extract($_POST);
+       $friendRequestedName= $_SESSION['frindUser']; 
+        
+        //user is not logged in, redirect to login page
+        if(!isset($_SESSION["user"]))
+        {
+            header("Location: Login.php?action=fri");
+            exit();
+        }
+        ?>
+        
        <h1 align='center'>My Friends</h1>
         <?php
-            echo "<p>Welcome X ! (Not you? Change user <a href='Login.php'>here</a>)</p> ";
+        
+           $theID= $_SESSION["user"];
+            $ID = $theID['UserId'];
+            $name= $theID['Name'];
+        
+            echo "<p>Welcome $name ! (Not you? Change user <a href='Login.php'>here</a>)</p> ";
+            
         ?>
         
        <form>
@@ -34,6 +49,7 @@ and open the template in the editor.
                 <th>Shared Albums</th>                
                 <th>Defriend</th>                                 
             </tr>  
+            
        </table>
             <input name="Defriend" type = "submit" value = "Defriend Selected" class="btn btn-info"   />
             <br/>
@@ -49,6 +65,11 @@ and open the template in the editor.
                     <th>Name</th>  
                     <th>Accept or Deny</th> 
                 </tr>
+                <?php
+                 echo "<tr>";
+                    echo "<th$friendRequestedName </th>";
+                 echo "<tr>";
+                ?>
             </table>
             <br/>
             <input name="Accept" type = "submit" value = "Accept Selected"  class="btn btn-info"  />

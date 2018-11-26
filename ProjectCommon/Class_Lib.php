@@ -33,6 +33,27 @@ class User
         return $this->password;
     }
 }
+class Accessibility 
+{
+    private $accessibilityCode ;
+    private $description;
+   
+
+    public function __construct($accessibilityCode, $description)
+    {
+        $this->accessibilityCode = $accessibilityCode;
+        $this->description = $description;
+    }
+
+    public function getAccessibitliyCode()
+    {
+        return $this->accessibilityCode;
+    }
+    public function getDescription()
+    {
+        return $this->description;
+    }
+}
 
 
 
