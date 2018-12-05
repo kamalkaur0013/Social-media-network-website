@@ -1,16 +1,26 @@
 <?php
-include("./ProjectCommon/Header.php");
+include './ProjectCommon/Header.php';        
+include("./ProjectCommon/Class_Lib.php");
+include ("./ProjectCommon/ConstantsAndSettings.php");
+
 ?>
 <html>
-    <?php
-        include './ProjectCommon/Header.php';        
-        include("./ProjectCommon/Class_Lib.php");
-        include './ProjectCommon/ConstantsAndSettings.php';
-        
+    <?php        
+        session_start();
+        extract($_POST);
+        $user1 = $_SESSION["user"];
+            
         $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
         extract($dbConnection);
         global $myPdo;
         $myPdo = new PDO($dsn, $user, $pw);
+        
+        //user is not logged in, redirect to login page
+        if(!isset($_SESSION["user"]))
+        {
+            header("Location: Login.php?action=alb");
+            exit();
+        }
         
     ?>
     <head>
@@ -24,15 +34,19 @@ include("./ProjectCommon/Header.php");
     <body>
         <?php
         
-            
             if (isset($_POST["uploadBtn"]))
             {
                 $selectedAlbum = $_POST["albumSelect"];
+                $_SESSION["albumIdSelected"] = $selectedAlbum;
                 $albumTitle = $_POST["albumTitle"];
+                $sanitizedAlbumTitle = htmlspecialchars($albumTitle); //sanitized title
+                
                 $photoDesc = $_POST["photoDesc"];
+                $sanitizedDesc = htmlspecialchars($photoDesc);    //sanitized description
+                
                 $currentDate = date('Y-m-d');
-            
-                // first make pictures folder if it doesn't exist
+                
+                // first make pictures folder along with its sub folders if it doesn't exist
                 $picFolder = "./Pictures";
                 
                 if (!file_exists($picFolder))
@@ -40,14 +54,13 @@ include("./ProjectCommon/Header.php");
                     mkdir($picFolder);
                 }
                 
-                // photos will first be put into original pics dir
                 $destination = ORIGINAL_PICTURES_DIR;
 
                 if (!file_exists($destination))
                 {
                     mkdir($destination);
                 }
-                
+
                 for ($i = 0; $i < count($_FILES["imageUpload"]["tmp_name"]); $i++)
                 {
                     if ($_FILES["imageUpload"]["error"][$i] == 0)
@@ -59,13 +72,15 @@ include("./ProjectCommon/Header.php");
                         $dir = $pathInfo["dirname"];
                         $fileName = $pathInfo["filename"];
                         $ext = $pathInfo["extension"];
+                        //echo $fileName;
+                        //echo $ext;
                         
                         // add picture info to database
                         $sqlInsertPhoto = "INSERT INTO Picture (Album_Id, FileName, Title, Description,Date_Added) "
                                 . "VALUES (:albumId, :fileName, :title, :description, :date)";
                         $stmtInsertPic = $myPdo->prepare($sqlInsertPhoto);
                         $stmtInsertPic->execute(['albumId'=>$selectedAlbum,'fileName'=>$fileName,
-                                                'title'=>$albumTitle,'description'=>$photoDesc,'date'=>$currentDate]);
+                                                'title'=>$sanitizedAlbumTitle,'description'=>$sanitizedDesc,'date'=>$currentDate]);
                         
                         // update album date
                         $sqlUpdateDate = "UPDATE Album SET Date_Updated = :updatedDate "
@@ -80,11 +95,12 @@ include("./ProjectCommon/Header.php");
                             $j++;
                             $filePath = $dir."/".$fileName."_".$j.".".$ext;
                         }
+                        
+                        // create picture object
+                        $picture = new Picture($fileName, $i);
+                        
                         // move image
                         move_uploaded_file($fileTempPath, $filePath);
-                      
-                        // create picture object
-                        //$picture = new Picture($fileName, $i);
                         
                         // image details
                         $imageDetails = getimagesize($filePath);
@@ -113,7 +129,8 @@ include("./ProjectCommon/Header.php");
                         $error = "Error happened while uploading the file(s). Try another time. <br>";
                     }
                 }
-            }
+                                 
+        }
         
         ?>
         
@@ -131,9 +148,12 @@ include("./ProjectCommon/Header.php");
             <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 
                 <?php
-                    $sqlAlbums = "SELECT Album_Id, Title From Album";     
+                    // get user ID
+                    $user_id = $user1["UserId"];
+                    
+                    $sqlAlbums = "SELECT Album_Id, Title From Album WHERE Album.Owner_Id = :userID";     
                     $stmtGetAlbum = $myPdo->prepare($sqlAlbums);
-                    $stmtGetAlbum->execute();
+                    $stmtGetAlbum->execute(["userID"=>$user_id]);
                     global $myAlbums;
                     $myAlbums = $stmtGetAlbum->fetchAll(); // data array
             

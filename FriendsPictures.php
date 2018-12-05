@@ -35,10 +35,11 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
             $selectedAlbum = $_POST["albumSelect"];
             $_SESSION["selectedAlbum"] = $selectedAlbum;
             
-            // retrieve href album ID from my albums page
-            $albumIdDisplay = $_GET["album_id"];
-            $_SESSION["preselectedAlbum"] = $albumIdDisplay;
-            
+            // retrieve href ID from my Friends page
+            global $getFriendID;
+            $getFriendID = $_GET["friendID"];
+            echo $getFriendID;
+                        
             $userid = $user1["UserId"];
 
             if (isset($_POST["commentBtn"]))
@@ -67,17 +68,18 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
             <form method="POST">
                 <input id="imageID" type="hidden" value="" name="picId">
                 <?php
-         
-                    // get user ID
-                    $user_id = $user1["UserId"];
-                    $sqlAlbums = "SELECT Album_Id, Title, Date_Updated From Album WHERE Album.Owner_Id = :userID";     
-                    $stmtGetAlbum = $myPdo->prepare($sqlAlbums);
-                    $stmtGetAlbum->execute(["userID"=>$user_id]);
-                    global $myAlbums;
-                    $myAlbums = $stmtGetAlbum->fetchAll(); // data array
+                    $dbConnection = parse_ini_file("ProjectCommon/db_connection.ini");
+                    extract($dbConnection);
+                    global $myPdo;
+                    $myPdo = new PDO($dsn, $user, $pw);
 
-                    //global $imageAltId;
-                    //echo $_POST["picId"];
+                    $sql_friendAlbum= "SELECT Album_Id, Title, Date_Updated FROM Album "
+                    . "WHERE Owner_Id = :friendID AND Accessibility_Code = 'shared'";
+                    
+                    $stmtGetFAlbum = $myPdo->prepare($sql_friendAlbum);
+                    $stmtGetFAlbum->execute(['friendID' =>$getFriendID]);
+                    global $myFAlbums;
+                    $myFAlbums = $stmtGetFAlbum->fetchAll(); // data array
                 ?>
                 
                 <div class="form-group">
@@ -86,15 +88,13 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
                         <select id="selectAlbum" class="form-control" name="albumSelect" 
                                 onchange="myFunction(this.form.submit())">    
                             <option value="" disabled selected hidden>Select Album</option>
-                            <?php foreach ($myAlbums as $albumChoice): ?>
+                            <?php foreach ($myFAlbums as $albumChoice): ?>
                                 <option value="<?=$albumChoice["Album_Id"]?>" 
-                                    <?php if($albumChoice["Album_Id"] == $albumIdDisplay)                                        
-                                        echo 'selected="selected"';
-                                        if(isset($selectedAlbum) && $selectedAlbum == $albumChoice["Album_Id"]) echo 'selected="selected"';?>>
+                                    <?php if(isset($selectedAlbum) && $selectedAlbum == $albumChoice["Album_Id"]) 
+                                        echo 'selected="selected"';?>>
                                         <?=$albumChoice["Title"]." - updated on ".$albumChoice["Date_Updated"]?>
                                 </option>
                             <?php endforeach ?>
-
                         </select>                           
                     </div>
                 </div>
@@ -102,13 +102,12 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
                 <h1 style="margin-left: 200px" id="title"></h1>
                 <?php
                 $albumSelect = $_SESSION["selectedAlbum"];
-
                 $pics = Picture::getPictures();
-                              
+
                 $sqlPictures = "SELECT FileName, Title, Picture_Id, Description FROM Picture "
-                                . "WHERE (Album_Id = :albumIdSelect) OR (Album_Id = :redirectAlbumId)";
+                                . "WHERE Album_Id = :albumIdSelect";
                 $stmtPicture = $myPdo->prepare($sqlPictures);
-                $stmtPicture->execute(['albumIdSelect'=>$albumSelect, 'redirectAlbumId'=>$albumIdDisplay]);
+                $stmtPicture->execute(['albumIdSelect'=>$albumSelect]);
                 global $pictureAlbum;
                 $pictureAlbum = $stmtPicture->fetchAll();
                 
@@ -121,12 +120,8 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
                 
                 ?>
                 
-                <div class="album" style="position: relative; width: 810px">
+                 <div class="album" style="position: relative; width: 810px">
                 <img id="viewer" src="" alt="" name="albumImage" class="normal">                
-                    <a href="#" onclick="rotateLeft()" id="left"><span class="glyphicon glyphicon-repeat gly-flip-horizontal-left"></span></a>                   
-                    <a href="#" onclick="rotateRight()" id="right"><span class="glyphicon glyphicon-repeat gly-flip-horizontal"></span></a>   
-                    <a href="" id="download"><span class="glyphicon glyphicon-download-alt"></span></a>
-                    <a href="" id="deleteLink"><span class="glyphicon glyphicon-trash"></span></a>                   
                 </div>
                 <div id="comment-desc-container" style="position: absolute; right: 100px; top: 300px; 
                      overflow-y: scroll; width: 320px; white-space: nowrap;">
@@ -154,7 +149,7 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
                          document.getElementById('imageID').value = '<?= $pic["Picture_Id"]?>';
                          document.getElementById('title').innerHTML = '<?= $pic["Title"]?>';
                          document.getElementById('description').innerHTML =
-                             '<?php if($pic["Description"] != null) {echo '<b>Description:</b><br>'.$pic["Description"];} ?>';
+                                 '<?php if($pic["Description"] != null) {echo '<b>Description:</b><br>'.$pic["Description"];} ?>';
                          document.getElementById('commentSection').innerHTML = 
                          '<?php 
                              if(count($comments)>0)
@@ -168,50 +163,20 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
                                 }                                 
                              }                              
                          ?>';
-                         document.getElementById('addComment').value='<?= $pic["Picture_Id"]?>';
-                         document.getElementById('deleteLink').href='Delete.php?file_path=<?=$upload->getThumbnailFilePath()?>';
-                         document.getElementById('download').href='Download.php?file_download=<?=$upload->getOriginalFilePath()?>';">                             
+                         document.getElementById('addComment').value='<?= $pic["Picture_Id"]?>';">                             
                     <?php endif ?>
                     <?php endforeach ?> 
                     <?php endforeach ?> 
                 </div>
-                <?php endif ?>               
+                <?php endif ?>
+               
                
             </form>
             
         </div>
         
         <script>            
-            function rotateLeft() 
-            {
-		var image = document.getElementById('viewer');
-
-		if (image.className === "normal") {
-			image.className = "rotate-left";
-		}
-		else if ( image.className === "rotate-left") {
-			image.className = 'normal';
-		}
-                else if ( image.className === "rotate-right") {
-			image.className = 'rotate-left';
-		}
-            }
-            
-            function rotateRight() 
-            {
-		var image = document.getElementById('viewer');
-
-		if (image.className === "normal") {
-			image.className = "rotate-right";
-		}
-		else if ( image.className === "rotate-right") {
-			image.className = 'normal';
-		}
-                else if ( image.className === "rotate-left") {
-			image.className = 'rotate-right';
-		}
-            }
-            
+                        
             function myFunction()
             {
                 
@@ -220,8 +185,7 @@ include ("./ProjectCommon/ConstantsAndSettings.php");
             // have thumbnail clicked to display album size immediately on page load
             window.onload = function() {
                 document.getElementById('thumb').click();
-                
-               
+
             }
         </script>
         

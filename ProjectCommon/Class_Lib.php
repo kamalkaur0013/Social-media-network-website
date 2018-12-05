@@ -1,5 +1,4 @@
 <?php
-include_once "ConstantsAndSettings.php";
 
 class User 
 {
@@ -55,6 +54,59 @@ class Accessibility
     }
 }
 
+include_once "ConstantsAndSettings.php";
+
+class Picture {
+    private $fileName;
+    private $id;
+    
+    public static function getPictures() 
+    {
+        $pictures = array();
+        $files = scandir(ALBUM_THUMBNAILS_DIR);
+        $numFiles = count($files);
+        
+        if ($numFiles > 2)
+        {
+            for ($i = 2; $i < $numFiles; $i++)
+            {
+                $ind = strrpos($files[$i], "/");
+                $fileName = substr($files[$i], $ind);
+                $picture = new Picture($fileName, $i);
+                $pictures["$i"] = $picture;
+            }
+        }
+        return $pictures;
+    }
+    
+    public function __construct($fileName,$id) {
+         $this->fileName = $fileName;
+         $this->id = $id;
+     }
+     
+     public function getId() {
+         return $this->id;
+     }
+     
+    public function getName() {
+        $ind = strrpos($this->fileName, ".");
+        $name = substr($this->fileName, 0, $ind);
+        return $name;
+    }
+    
+    public function getAlbumFilePath() {
+        return ALBUM_PICTURES_DIR."/".$this->fileName;
+    }
+    
+    public function getThumbnailFilePath() {
+        return ALBUM_THUMBNAILS_DIR."/".$this->fileName;
+    }
+    
+    public function getOriginalFilePath() {
+        return ORIGINAL_PICTURES_DIR."/".$this->fileName;
+    }
+    
+}
 
 
 function ValidatePhone($phone)
@@ -110,58 +162,6 @@ function ValidatePassword2($password1, $password2)
     return $error;
 }
 
-
-class Picture {
-    private $fileName;
-    private $id;
-    
-    public static function getPictures() 
-    {
-        $pictures = array();
-        $files = scandir(ALBUM_THUMBNAILS_DIR);
-        $numFiles = count($files);
-        
-        if ($numFiles > 2)
-        {
-            for ($i = 2; $i < $numFiles; $i++)
-            {
-                $ind = strrpos($files[$i], "/");
-                $fileName = substr($files[$i], $ind);
-                $picture = new Picture($fileName, $i);
-                $pictures["$i"] = $picture;
-            }
-        }
-        return $pictures;
-    }
-    
-    public function __construct($fileName,$id) {
-         $this->fileName = $fileName;
-         $this->id = $id;
-     }
-     
-     public function getId() {
-         return $this->id;
-     }
-     
-       public function getName() {
-         $ind = strrpos($this->fileName, ".");
-         $name = substr($this->fileName, 0, $ind);
-         return $name;
-     }
-    
-    public function getAlbumFilePath() {
-        return ALBUM_PICTURES_DIR."/".$this->fileName;
-    }
-    
-    public function getThumbnailFilePath() {
-        return ALBUM_THUMBNAILS_DIR."/".$this->fileName;
-    }
-    
-    public function getOriginalFilePath() {
-        return ORIGINAL_PICTURES_DIR."/".$this->fileName;
-    }
-    
-}
 
 function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight)
 {
@@ -231,6 +231,25 @@ function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight)
     {
             return $newFilePath;
     }
+}
+
+function downloadFile($filePath)
+{
+   $fileName = basename($filePath);
+   $fileLength = filesize($filePath);
+
+   header("Content-Type: application/octet-stream");
+   header("Content-Disposition: attachment; filename = \"$fileName\" ");
+   header("Content-Length: $fileLength" );
+   header("Content-Description: File Transfer");
+   header("Expires: 0");
+   header("Cache-Control: must-revalidate");
+   header("Pragma: private");
+
+   ob_clean();
+   flush();
+   readfile($filePath);
+   flush();
 }
 
 ?>

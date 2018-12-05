@@ -1,0 +1,141 @@
+.container {
+    margin: 0 auto;
+    width: 800px;
+}
+
+#pics li {
+    display:inline;
+}
+
+.album {
+    position: relative;
+    overflow: hidden;
+    
+    
+}
+
+.album .gly-flip-horizontal-left {
+    transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+}
+
+.album .glyphicon{
+    position: absolute;    
+}
+
+.album .gly-flip-horizontal-left {
+    padding-right: 5px;
+    top: 450px;
+    left: 300px;
+}
+
+.album .gly-flip-horizontal {
+    top: 450px;
+    left: 350px;
+}
+
+.album .glyphicon-download-alt {
+    top: 450px;
+    left: 400px;
+}
+
+.album .glyphicon-trash {
+    top: 450px;
+    left: 450px;
+}
+
+.album a {
+    display: none;
+}
+
+.album:hover a {
+    display: inline-block;
+}
+
+.album:hover #viewer {
+    opacity: 0.5;
+}
+
+.glyphicon {
+    font-size: 40px;
+    color: blue;
+}
+
+.rotate-left {
+   -ms-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+     transform: rotate(-90deg);
+}
+
+.rotate-right {
+   -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+     transform: rotate(90deg);
+}
+
+.normal {
+   -ms-transform: scale(-1,1);
+    -webkit-transform: scale(-1,1);
+     transform: scale(-1,1);
+     -o-transform: scale(-1,1);
+     -ms-transform: scale(-1,1);
+}
+
+.scroll {
+    bottom: 200px;
+    width: 400px;
+    overflow-x: scroll;
+    white-space: nowrap;
+/*    z-index: 10;*/
+}
+
+/*.scroll li {
+    display: inline;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+.scroll li:hover {
+    background-color: #777;
+}*/
+
+.images {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}
+
+.active-image {
+   border:2px solid #555;
+}
+
+
+
+/*.viewer {
+    position: relative;
+    transition: .5s ease;
+    opacity: 1;
+}
+.viewer:hover {
+    transition: .5s ease;
+    opacity: 0.3;
+}*/
+
+/*
+
+
+.download {
+    position: absolute;
+    top: 70%;
+    right: 50%;
+    visibility: hidden;
+}
+
+.viewer:hover .download{
+    visibility: visible;
+}*/

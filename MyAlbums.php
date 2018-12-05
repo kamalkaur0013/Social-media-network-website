@@ -29,24 +29,37 @@ include("./ProjectCommon/Class_Lib.php");
                 header("Location: Login.php?action=alb");
                 exit();
             }
-            // get user's name from array
+            // get user's name from array session
             $name = $user1["Name"];
-            
+            $id = $user1["UserId"];
             // drop down selection
             $accessSelection = $_POST["accessChoice"];
-            $accessSelection_explode = explode("|", $accessSelection);
-            $accessChoice = $accessSelection_explode[0]; // accessibility option
-            $albumid = $accessSelection_explode[1];  // album id
-                 
-            // save changes for accessibility
+            
+             //save changes for accessibility
             if (isset($_POST["saveBtn"]))
-            {               
-                $sqlUpdateAccess = "UPDATE Album SET Accessibility_Code = :updatedAccess "
-                        . "WHERE Album_Id = :id";
-                $stmtSaveChanges = $myPdo->prepare($sqlUpdateAccess);
-                $stmtSaveChanges->execute(['updatedAccess'=> $accessChoice, 'id'=>$albumid]);             
-            }
+            {  
+                $albumIdArray = array(); // album id array
+                $accessCode = array();   // accessibility code array
+                foreach ($accessSelection as $value) 
+                {
+                    $accessSelection_explode = explode("|", $value);  // explode to remove delimiter
+                    
+                    array_push($albumIdArray, $accessSelection_explode[0]); 
+                    array_push($accessCode, $accessSelection_explode[1]);
+                }
+                
+                // combine albumId and accessCode arrays into one array of key value pairs
+                $combinedArray = array_combine($albumIdArray, $accessCode);
+                
+                foreach ($combinedArray as $albumId => $accessibilityCode) 
+                {
+                    $sqlUpdateAccess = "UPDATE Album SET Accessibility_Code = :updatedAccess "
+                            . "WHERE Album_Id = :id AND Owner_Id = :userId";
+                    $stmtSaveChanges = $myPdo->prepare($sqlUpdateAccess);
+                    $stmtSaveChanges->execute(['updatedAccess'=> $accessibilityCode, 'id'=>$albumId, 'userId'=>$id]);
+                }
         
+            }
         
         ?>
         
@@ -73,15 +86,17 @@ include("./ProjectCommon/Class_Lib.php");
 
             <?php 
 
-            //comment
+            // get user ID
+            $user_id = $user1["UserId"];
             // get albums
             $sqlGetAlbums = "SELECT Album.Album_Id, Album.Title, Album.Date_Updated, COUNT(Picture.Picture_Id) as 'Total', Album.Accessibility_Code "
                     . "FROM Album "
                     . "LEFT JOIN Picture ON (Picture.Album_Id=Album.Album_Id) "
+                    . "WHERE Album.Owner_Id = :userId "
                     . "Group BY Album.Album_Id";
 
             $stmtAlbum = $myPdo->prepare($sqlGetAlbums);
-            $stmtAlbum->execute();
+            $stmtAlbum->execute(["userId"=>$user_id]);
             global $albumArray;
             $albumArray = $stmtAlbum->fetchAll(); 
 
@@ -101,11 +116,11 @@ include("./ProjectCommon/Class_Lib.php");
                 <td><?=$album["Date_Updated"]?></td>
                 <td><?=$album["Total"]?></td>
                 <td>
-                    <select class="form-control" name="accessChoice">  
+                    <select class="form-control" name="accessChoice[]">  
                      <!--set drop down values to accessibility codes-->
                      <!--set drop down selection to the albums accessibility code-->
                     <?php foreach ($accessArray as $accessOption): ?>
-                        <option value="<?=$accessOption['Accessibility_Code']?>|<?=$album['Album_Id']?>"
+                        <option value="<?=$album['Album_Id']?>|<?=$accessOption['Accessibility_Code']?>"
                             <?php if($album['Accessibility_Code'] == $accessOption['Accessibility_Code']) 
                                 echo 'selected="selected"';?>>
                             <!--show accessibility description as drop down option-->
