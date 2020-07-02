@@ -1,1 +1,1 @@
-# PHPTermProject
+# Social media network project
